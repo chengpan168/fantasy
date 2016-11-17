@@ -61,11 +61,11 @@ public class Zg3DDayinPage implements PageProcessor {
 
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         int pageIndex = 1;
         int maxPage = 1;
         for (int i = pageIndex; i <= maxPage; i++) {
             Spider.create(new Zg3DDayinPage()).addUrl("http://www.3ddayin.net/zx/list_2_" + i + ".html").addPipeline(new FilePipeline("/Users/chengpanwang/Downloads/3d")).thread(1).run();
         }
-    }
+    }*/
 }

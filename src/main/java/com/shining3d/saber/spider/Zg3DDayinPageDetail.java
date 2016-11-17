@@ -49,11 +49,11 @@ public class Zg3DDayinPageDetail implements PageProcessor {
         String content = page.getHtml().xpath("//div[@class='m4_box6']").toString();
 
         List<String> imgList = page.getHtml().xpath("//div[@class='m4_box6']//img/@src").all();
-        /*page.putField("img", imgList);
+        page.putField("img", imgList);
         for (String imgUrl : imgList) {
             String url = upload(imgUrl);
             content = StringUtils.replace(content, imgUrl, url);
-        }*/
+        }
 
         page.putField("content", content);
 
@@ -120,8 +120,8 @@ public class Zg3DDayinPageDetail implements PageProcessor {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Spider.create(new Zg3DDayinPageDetail()).addUrl("http://www.3ddayin.net/zx/26094.html").addPipeline(new FilePipeline(
                                                                                                                                    "/Users/chengpanwang/Downloads/3d")).thread(1).run();
-    }
+    }*/
 }
