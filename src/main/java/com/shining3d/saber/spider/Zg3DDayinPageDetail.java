@@ -120,8 +120,8 @@ public class Zg3DDayinPageDetail implements PageProcessor {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         Spider.create(new Zg3DDayinPageDetail()).addUrl("http://www.3ddayin.net/zx/26094.html").addPipeline(new FilePipeline(
                                                                                                                                    "/Users/chengpanwang/Downloads/3d")).thread(1).run();
-    }
+    }*/
 }
