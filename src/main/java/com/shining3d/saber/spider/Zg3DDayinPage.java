@@ -44,6 +44,12 @@ public class Zg3DDayinPage implements PageProcessor {
         for (String link : hrefList) {
             logger.info("抓取第{}页， 第{}条记录", saberConfig.getSpider3DDayinCurrentPage(), i++);
             Spider.create(zg3DDayinPageDetail).addUrl(link).addPipeline(new SaberFilePipeline(getFilePath())).thread(1).run();
+
+            try {
+                TimeUnit.SECONDS.sleep(saberConfig.getSpiderSleepTime());
+            } catch (Exception e) {
+                logger.error("", e);
+            }
         }
 
         logger.info("抓取第 {} 页完成，耗时:{} ms", saberConfig.getSpider3DDayinCurrentPage(), stopwatch.elapsed(TimeUnit.MILLISECONDS));

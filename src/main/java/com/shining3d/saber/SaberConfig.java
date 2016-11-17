@@ -1,6 +1,7 @@
 package com.shining3d.saber;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by panwang.chengpw on 16/11/16.
@@ -17,6 +18,8 @@ public class SaberConfig {
     private String imgUploadUrl;
     private String authPanguAccessSecret;
     private String authPanguAccessId;
+
+    private long spiderSleepTime = 0;
 
     private boolean spider3DDayinSwitch;
 
@@ -90,5 +93,17 @@ public class SaberConfig {
 
     public boolean getSpider3DDayinSwitch() {
         return spider3DDayinSwitch;
+    }
+
+    public void setSpiderSleepTime(String spiderSleepTime) {
+        if (StringUtils.isBlank(spiderSleepTime)) {
+            return;
+        }
+
+        this.spiderSleepTime = Long.valueOf(spider3DDayinPageEnd);
+    }
+
+    public long getSpiderSleepTime() {
+        return spiderSleepTime;
     }
 }

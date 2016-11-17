@@ -66,5 +66,6 @@
         <property name="imgUploadUrl" value="${imgUploadUrl}"/>
         <property name="authPanguAccessId" value="${auth.pangu.accessId}"/>
         <property name="authPanguAccessSecret" value="${auth.pangu.accessSecret}"/>
+        <property name="spiderSleepTime" value="${spider.sleepTime}"/>
     </bean>
 </beans>
