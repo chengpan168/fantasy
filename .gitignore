@@ -1,0 +1,13 @@
+*.classpath
+*.DS_Store
+/target
+.settings/
+.project
+*.log*
+*.log
+metis.log
+.idea
+*.iml
+disconf/
+*.class
+*.jar

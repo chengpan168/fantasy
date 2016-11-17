@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="disconfMgrBean" class="com.baidu.disconf.client.DisconfMgrBean"
+          destroy-method="destroy">
+        <property name="scanPackage" value="com.shining3d.saber"/>
+    </bean>
+    <bean id="disconfMgrBean2" class="com.baidu.disconf.client.DisconfMgrBeanSecond"
+          init-method="init" destroy-method="destroy">
+    </bean>
+
+    <!-- 使用托管方式的disconf配置(无代码侵入, 配置更改不会自动reload)-->
+    <bean id="configproperties_no_reloadable_disconf"
+          class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:/redis.properties</value>
+                <value>classpath*:/jdbc.properties</value>
+                <value>classpath*:/config.properties</value>
+                <value>classpath*:/dubbo.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="propertyConfigurerForProject1"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="propertiesArray">
+            <list>
+                <ref bean="configproperties_no_reloadable_disconf"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="configproperties_disconf"
+          class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:/dynamic_config.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="propertyConfigurer"
+          class="com.baidu.disconf.client.addons.properties.ReloadingPropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="propertiesArray">
+            <list>
+                <ref bean="configproperties_disconf"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="magellanConfig" class="com.shining3d.saber.SaberConfig">
+        <property name="spider3DDayinDownloadPath" value="${spider.3ddayin.downloadPath}"/>
+        <property name="spider3DDayinPageStart" value="${spider.3ddayin.pageStart}"/>
+        <property name="spider3DDayinPageEnd" value="${spider.3ddayin.pageEnd}"/>
+        <property name="spider3DDayinPageUrl" value="${spider.3ddayin.pageUrl}"/>
+        <property name="imgUploadUrl" value="${imgUploadUrl}"/>
+        <property name="authPanguAccessId" value="${auth.pangu.accessId}"/>
+        <property name="authPanguAccessSecret" value="${auth.pangu.accessSecret}"/>
+    </bean>
+</beans>

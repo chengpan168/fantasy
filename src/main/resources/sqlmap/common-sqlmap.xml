@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--这块等于dao接口的实现 namespace必须和接口的类路径一样 -->
+
+<mapper namespace="SHINING3D_COMMON">
+    
+    <sql id="SHINING3D_PAGING" >
+        <if test="pageInfo.pageSize != null">
+		   limit #{pageInfo.startIndex} , #{pageInfo.pageSize}
+		</if>
+    </sql>
+    
+    <sql id="SHINING3D_ORDER" >
+        <if test="pageInfo.orderByList != null" >
+           <foreach collection="pageInfo.orderByList" item="order" open="order by " separator="," close=" ">
+               ${order.dbFieldName}   ${order.sortDirection} 
+           </foreach>
+		</if>
+    </sql> 
+   
+</mapper>

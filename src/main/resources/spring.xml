@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.2.xsd
+           http://www.springframework.org/schema/tx 
+           http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+
+    <context:component-scan base-package="com.shining3d"/>
+
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" primary="true"
+          destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="${3dkercn.jdbc.url}"/>
+        <property name="username" value="${3dkercn.jdbc.username}"/>
+        <property name="password" value="${3dkercn.jdbc.password}"/>
+        <property name="maxActive" value="30"/>
+        <property name="initialSize" value="5"/>
+        <property name="minIdle" value="5"/>
+        <property name="maxWait" value="6000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="600000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="filters" value="stat"/>
+    </bean>
+
+    <!--<bean id="minasDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="${minas.jdbc.url}"/>
+        <property name="username" value="${minas.jdbc.username}"/>
+        <property name="password" value="${minas.jdbc.password}"/>
+        <property name="maxActive" value="30"/>
+        <property name="initialSize" value="5"/>
+        <property name="minIdle" value="5"/>
+        <property name="maxWait" value="6000"/>
+        <property name="timeBetweenEvictionRunsMillis" value="600000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="filters" value="stat"/>
+    </bean>-->
+
+
+    <bean id="cn3dkerSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:sqlmap/*-sqlmap.xml"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.shining3d.*.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="cn3dkerSqlSessionFactory"/>
+    </bean>
+
+
+    <bean id="configManager" class="com.shining3d.common.ConfigManager">
+    </bean>
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"></bean>
+
+    <bean id="jedisService" class="com.shining3d.common.JedisService" init-method="init" destroy-method="destroy">
+        <property name="servers" value="${redis.servers}"></property>
+        <property name="passwd" value="${redis.password}"></property>
+    </bean>
+
+    <bean id="resourceManager" class="com.shining3d.common.resource.ResourceManagerDBImpl"
+          init-method="init" destroy-method="destroy">
+        <property name="appDataSourceBean" value="dataSource"></property>
+        <property name="loaderImpl"
+                  value="com.shining3d.common.resource.RedisDBResourceLoaderImpl"></property>
+        <property name="loaderArgs" ref="jedisService"/>
+        <property name="applicationName" value="${app.saber.name}"></property>
+        <property name="initSql"
+                  value="select name,load_sql,obj_class_name,key_name,parent,groups,cron_text,data_source_bean from t_resource_info where deleted='n' and app_name='${app.saber.name}'  "></property>
+    </bean>
+
+    <bean id="dataSourceTransactionManagerMysql"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManagerMysql" proxy-target-class="true"/>
+
+    <tx:advice id="defaultTxAdviceMysql" transaction-manager="dataSourceTransactionManagerMysql">
+        <tx:attributes>
+            <tx:method name="*" rollback-for="Exception"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="repository_mysql"
+                      expression="execution(* com.shining3d..repository.*Repository.*(..)) "/>
+        <aop:advisor pointcut-ref="repository_mysql" advice-ref="defaultTxAdviceMysql"/>
+    </aop:config>
+
+
+    <bean id ="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="2"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="queueCapacity" value="200"/>
+        <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+    </bean>
+
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.shining3d.common.StringToDateConverter"></bean>
+            </set>
+        </property>
+    </bean>
+
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.shining3d.saber.controller.interceptor.AuthAccessRequiredInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <import resource="spring-disconf.xml"/>
+    <import resource="spring-dubbo-provider.xml"/>
+    <import resource="spring-dubbo-consumer.xml"/>
+
+
+</beans>
