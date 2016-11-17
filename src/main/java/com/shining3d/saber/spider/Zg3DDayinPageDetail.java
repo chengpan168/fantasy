@@ -46,7 +46,7 @@ public class Zg3DDayinPageDetail implements PageProcessor {
         page.putField("title", page.getHtml().xpath("//h2[@class='m4_box4']"));
         page.putField("info", page.getHtml().xpath("//div[@class='m4_box5']"));
 
-        String content = page.getHtml().xpath("//div[@class='m4_box6']").toString();
+        String content = page.getHtml().xpath("//div[@class='m4_box6']/text()").toString();
 
         List<String> imgList = page.getHtml().xpath("//div[@class='m4_box6']//img/@src").all();
         page.putField("img", imgList);
