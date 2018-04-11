@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git pull  origin master
+
 mvn install -Dmaven.test.skip
 
 echo '获取fantasy进程 id'
@@ -34,4 +36,4 @@ done
 JAVA_OPTS=""$JAVA_OPTS" -Dwebdriver.chrome.driver=./chromedriver"
 
 
-nohup java $JAVA_OPTS -jar fantasy-1.0.0.jar  &
+nohup java $JAVA_OPTS -jar target/fantasy-1.0.0.jar  &
