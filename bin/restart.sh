@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mvn install -Dmaven.test.skip
+
 echo '获取fantasy进程 id'
 
 javaId=`ps -ef |grep fantasy | grep -v grep | awk '{print $2}'`
