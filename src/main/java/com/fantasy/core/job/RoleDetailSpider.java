@@ -74,9 +74,14 @@ public class RoleDetailSpider {
                 }
             }
 
-            webDriver.close();
+
         } catch (Exception e) {
             logger.error("", e);
+        } finally {
+            if (webDriver != null) {
+                webDriver.close();
+                webDriver.quit();
+            }
         }
 
         return price;
